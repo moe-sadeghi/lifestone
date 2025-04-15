@@ -1,0 +1,7 @@
+__pycache__/
+.venv/
+*.pyc
+*.pyo
+.DS_Store
+Thumbs.db
+static/debug_markers.jpg
