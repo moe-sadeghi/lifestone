@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Lifestone - Slab Processor</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; background: #f6f6f6; }
+    form { background: white; padding: 20px; border-radius: 8px; max-width: 500px; margin: auto; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+    input, textarea, button, label, select { display: block; width: 100%; margin-bottom: 15px; }
+    input[type="file"], input[type="checkbox"], select.inline { width: auto; display: inline-block; }
+    button { background-color: #2a7ae2; color: white; border: none; padding: 10px; font-size: 16px; border-radius: 5px; cursor: pointer; }
+    button:hover { background-color: #1e5bbf; }
+    h2 { text-align: center; }
+    .row { display: flex; gap: 10px; }
+    .row input, .row select { flex: 1; }
+  </style>
+</head>
+<body>
+  <h2>Lifestone - Upload Slab Image</h2>
+  <form action="/confirm" method="POST" enctype="multipart/form-data">
+    <label>Select slab image:</label>
+    <input type="file" name="image" accept="image/*" required>
+
+    <label>Select common stone thickness:</label>
+    <select id="presetThickness" onchange="setThicknessFromPreset()">
+      <option value="">-- Select thickness --</option>
+      <option value="30">1-1/4&quot; - 30mm</option>
+      <option value="20">3/4&quot; - 20mm</option>
+      <option value="40">1-1/2&quot; - 40mm</option>
+    </select>
+
+    <label>Or enter custom thickness:</label>
+    <div class="row">
+      <input type="number" name="thickness" id="thicknessInput" value="30" step="0.1" required>
+      <select name="unit" id="unitSelect" class="inline">
+        <option value="mm">mm</option>
+        <option value="inch">inch</option>
+      </select>
+    </div>
+
+    <label>Notes (optional):</label>
+    <textarea name="notes" rows="4" placeholder="You can describe slab features, ID, location, etc."></textarea>
+
+    <label>
+      <input type="checkbox" name="terms" required>
+      I accept the terms and conditions.
+    </label>
+
+    <button type="submit">Upload & Process</button>
+  </form>
+
+  <script>
+    function setThicknessFromPreset() {
+      const preset = document.getElementById('presetThickness').value;
+      const input = document.getElementById('thicknessInput');
+      const unit = document.getElementById('unitSelect');
+      if (preset !== "") {
+        input.value = preset;
+        unit.value = "mm";
+      }
+    }
+  </script>
+</body>
+</html>
