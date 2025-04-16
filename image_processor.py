@@ -1,4 +1,3 @@
-
 import cv2
 import numpy as np
 from PIL import Image, ExifTags
@@ -7,12 +6,13 @@ import os
 # ---------------------------------------------------------------------------
 # Constants
 # ---------------------------------------------------------------------------
-REQUIRED_IDS = [1, 18, 43, 14]            # reference ArUco tags
-ARUCO_DICT   = cv2.aruco.DICT_7X7_250     # dictionary used on printed markers
-BOTTOM_EXTRA_PX = 300                     # extra space added below cropped slab
+REQUIRED_IDS     = [1, 18, 43, 14]            # reference ArUco tags
+ARUCO_DICT       = cv2.aruco.DICT_7X7_250     # dictionary used on printed markers
+BOTTOM_EXTRA_PX  = 300                        # extra space added below cropped slab
+MAX_SIDE_PX      = 3000                       # <-- NEW: shrink very large uploads
 
 # ---------------------------------------------------------------------------
-# Helper: friendly EXIF dump
+# Helpers
 # ---------------------------------------------------------------------------
 def _dump_exif(pil_img):
     exif_raw = pil_img._getexif()
@@ -23,6 +23,21 @@ def _dump_exif(pil_img):
         tag = ExifTags.TAGS.get(tag_id, str(tag_id))
         lines.append(f"{tag}: {val}")
     return "\n".join(lines)
+
+
+def safe_load(path: str):
+    """
+    Load an image via Pillow first; if either dimension exceeds MAX_SIDE_PX,
+    down‑scale in‑place so Render free instances do not run out of memory.
+    Returns the image as a NumPy array ready for OpenCV.
+    """
+    pil = Image.open(path)
+    if max(pil.size) > MAX_SIDE_PX:
+        pil.thumbnail((MAX_SIDE_PX, MAX_SIDE_PX), Image.LANCZOS)
+        pil.save(path, format="JPEG", quality=92)
+    pil.close()
+    return cv2.imread(path)
+
 
 # ---------------------------------------------------------------------------
 # Main processing routine
@@ -39,12 +54,11 @@ def process_slab_image(
     """
     Detects four reference ArUco markers (IDs 1,18,43,14) in the 7×7‑250 family,
     warps the slab to a rectangle of *frame_width_mm* × *frame_height_mm*,
-    crops off the marker border (so the final image is marker‑free), then
-    **extends the bottom edge by 300 px** to give extra space for custom
-    cropping/annotations. The processed image is saved at *output_path* and a
-    companion text file "*_info.txt" summarises the original DPI, chosen PPI
-    and all EXIF tags.
+    crops off the marker border, then **extends the bottom edge by 300 px**.
+    The processed image is saved at *output_path* and a companion text file
+    "*_info.txt" summarises the original DPI, chosen PPI and all EXIF tags.
     """
+
     # ---------------------------------------------------------------------
     # 1. Load via Pillow to capture EXIF & DPI
     # ---------------------------------------------------------------------
@@ -53,8 +67,8 @@ def process_slab_image(
     exif_text = _dump_exif(pil_orig)
     pil_orig.close()
 
-    # Load again in OpenCV for processing
-    image = cv2.imread(input_path)
+    # Load for processing (with memory‑safe resize)
+    image = safe_load(input_path)
     if image is None:
         raise ValueError(f"Cannot load image: {input_path}")
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
