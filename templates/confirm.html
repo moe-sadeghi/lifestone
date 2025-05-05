@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Lifestone - Processing Complete</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; background: #f6f6f6; }
+    .container { background: white; padding: 20px; border-radius: 8px; max-width: 600px; margin: auto; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+    h2 { text-align: center; font-size: 24px; }
+    h3 { font-size: 20px; }
+    ul { list-style: none; padding: 0; }
+    li { margin-bottom: 10px; }
+    a { color: #2a7ae2; text-decoration: none; font-size: 18px; }
+    a:hover { text-decoration: underline; }
+    p { font-size: 16px; }
+    .summary { margin-top: 20px; border-top: 1px solid #ccc; padding-top: 10px; }
+    .summary p { font-size: 16px; margin: 5px 0; }
+    .counter { margin-top: 20px; border-top: 1px solid #ccc; padding-top: 10px; text-align: center; }
+    .counter p { font-size: 18px; font-weight: bold; color: #2a7ae2; }
+    .reset-btn { background-color: #dc3545; color: white; padding: 10px; font-size: 16px; border-radius: 5px; cursor: pointer; border: none; }
+    .reset-btn:hover { background-color: #c82333; }
+    .footer { margin-top: 20px; text-align: center; font-size: 14px; color: #6c757d; }
+    @media (max-width: 600px) {
+        .error-box, .summary { font-size: 16px; }
+        .error-box h4 { font-size: 20px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Processing Complete</h2>
+    <p>Your slab has been processed, and the report is ready.</p>
+    <h3>Downloads</h3>
+    <ul>
+      {% for file in results.downloads %}
+        <li><a href="{{ url_for('serve_file', filename=file) }}" download="{{ file }}">{{ file }}</a></li>
+      {% endfor %}
+    </ul>
+    <p>(Downloads may be in your browser's download folder or Files app.)</p>
+
+    <div class="summary">
+      <h3>Submission Summary</h3>
+      <p><strong>Project Name:</strong> {{ data.project_name if data.project_name else "Not provided" }}</p>
+      <p><strong>Serial Number:</strong> {{ data.serial_number if data.serial_number else "Not provided" }}</p>
+      <p><strong>Material:</strong> {{ data.material if data.material else "Not provided" }}</p>
+      <p><strong>Dimensions:</strong> {{ data.length if data.length else "Not provided" }} cm x {{ data.width if data.width else "Not provided" }} cm x {{ data.thickness }} {{ data.unit }}</p>
+      <p><strong>Make:</strong> {{ data.make }}</p>
+      <p><strong>Model:</strong> {{ data.model }}</p>
+      <p><strong>Batch/Lot Number:</strong> {{ data.batch_number }}</p>
+      <p><strong>Notes:</strong> {{ data.notes if data.notes else "None" }}</p>
+    </div>
+
+    <div class="counter">
+      <p>You have documented {{ session.slab_count }} slab(s) in this session.</p>
+      <form action="/reset_count" method="POST" style="margin-top: 10px;">
+        <button type="submit" class="reset-btn">Reset Count</button>
+      </form>
+    </div>
+
+    <p><a href="{{ url_for('index') }}">Process another slab</a></p>
+    <div class="footer">
+      <p>Powered by Lifestone</p>
+    </div>
+  </div>
+</body>
+</html>

@@ -3,20 +3,16 @@ import numpy as np
 from PIL import Image, ExifTags
 import os
 
-# ---------------------------------------------------------------------------
 # Constants
-# ---------------------------------------------------------------------------
-REQUIRED_IDS     = [1, 18, 43, 14]           # reference ArUco tags
-ARUCO_DICT       = cv2.aruco.DICT_7X7_250    # dictionary used on printed markers
-BOTTOM_EXTRA_PX  = 300                       # final extra space (same as before)
-PRE_MARGIN_PX    = 244                       # bottom margin after pre‑crop
-TARGET_PPI       = 25.4                      # 1 px ≈ 1 mm  (fixed output DPI)
-CAMERA_DISTANCE_IN = 120.0                   # Fixed camera distance (inches)
-SUPPORT_THICKNESS_IN = 0.245                 # Hidden support thickness (inches)
+REQUIRED_IDS     = [1, 18, 43, 14]
+ARUCO_DICT       = cv2.aruco.DICT_7X7_250
+BOTTOM_EXTRA_PX  = 300
+PRE_MARGIN_PX    = 244
+TARGET_PPI       = 25.4
+CAMERA_DISTANCE_IN = 120.0
+SUPPORT_THICKNESS_IN = 0.245
 
-# ---------------------------------------------------------------------------
 # Helpers
-# ---------------------------------------------------------------------------
 def _dump_exif(pil_img):
     exif_raw = pil_img._getexif()
     if not exif_raw:
@@ -26,7 +22,6 @@ def _dump_exif(pil_img):
         tag = ExifTags.TAGS.get(tag_id, str(tag_id))
         lines.append(f"{tag}: {val}")
     return "\n".join(lines)
-
 
 def _detect_markers(gray):
     aruco_dict = cv2.aruco.getPredefinedDictionary(ARUCO_DICT)
@@ -40,10 +35,13 @@ def _detect_markers(gray):
         raise ValueError(f"Missing marker IDs: {missing}")
     return corners, ids
 
+def resize_image_for_pdf(input_path, output_path, max_width=800):
+    """Resize image to fit PDF page, maintaining aspect ratio."""
+    img = Image.open(input_path)
+    img.thumbnail((max_width, max_width), Image.Resampling.LANCZOS)
+    img.save(output_path, dpi=(72, 72))
+    return output_path
 
-# ---------------------------------------------------------------------------
-# Main processing routine
-# ---------------------------------------------------------------------------
 def process_slab_image(
     input_path,
     output_path,
@@ -52,24 +50,12 @@ def process_slab_image(
     frame_height_in: float = 94.2,
     debug_path: str | None = 'static/debug_markers.jpg'
 ) -> bool:
-    """
-    Two-stage processing:
-    1) Pre-crop around ArUco markers (+ ≤244 px bottom margin) to shrink image.
-    2) Perspective-correct, crop frame, extend bottom by 300 px, save at 25.4 PPI.
-    Includes slab thickness correction to compute surface-level frame size.
-    """
-
-    # Convert slab thickness to inches and apply support offset
     stone_thickness_in = stone_thickness_mm / 25.4
     total_offset_in = stone_thickness_in + SUPPORT_THICKNESS_IN
 
-    # Corrected frame dimensions based on slab height
     corrected_width_in = frame_width_in * (CAMERA_DISTANCE_IN - total_offset_in) / CAMERA_DISTANCE_IN
     corrected_height_in = frame_height_in * (CAMERA_DISTANCE_IN - total_offset_in) / CAMERA_DISTANCE_IN
 
-    # ---------------------------------------------------------------------
-    # Stage 0 · Load & EXIF
-    # ---------------------------------------------------------------------
     pil_orig = Image.open(input_path)
     exif_text = _dump_exif(pil_orig)
     pil_orig.close()
@@ -79,9 +65,6 @@ def process_slab_image(
         raise ValueError(f"Cannot load image: {input_path}")
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
-    # ---------------------------------------------------------------------
-    # Stage 1 · Detect markers & pre-crop
-    # ---------------------------------------------------------------------
     corners, ids = _detect_markers(gray)
     all_pts = np.concatenate([c.reshape(-1,2) for c in corners], axis=0)
     x_min, y_min = np.min(all_pts, axis=0)
@@ -99,9 +82,6 @@ def process_slab_image(
     corners_pre, ids_pre = _detect_markers(gray_pre)
     id_to_corners = {id_[0]: c.reshape(4,2) for c,id_ in zip(corners_pre, ids_pre)}
 
-    # ---------------------------------------------------------------------
-    # Stage 2 · Perspective transform
-    # ---------------------------------------------------------------------
     src_pts = np.array([
         id_to_corners[1][0],
         id_to_corners[18][1],
@@ -123,9 +103,6 @@ def process_slab_image(
     M = cv2.getPerspectiveTransform(src_pts, dst_pts)
     warped = cv2.warpPerspective(pre_cropped, M, (dst_w, dst_h))
 
-    # ---------------------------------------------------------------------
-    # Crop to slab only (remove markers)
-    # ---------------------------------------------------------------------
     transformed = {}
     for mid, pts in id_to_corners.items():
         pts_reshaped = pts.reshape(-1,1,2).astype(np.float32)
@@ -148,9 +125,6 @@ def process_slab_image(
 
     final_img = warped[top:bottom, left:right]
 
-    # ---------------------------------------------------------------------
-    # Save image + info
-    # ---------------------------------------------------------------------
     out_pil = Image.fromarray(cv2.cvtColor(final_img, cv2.COLOR_BGR2RGB))
     out_pil.save(output_path, dpi=(TARGET_PPI, TARGET_PPI))
 

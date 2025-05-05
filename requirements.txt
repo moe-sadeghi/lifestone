@@ -3,3 +3,6 @@ opencv-python
 Pillow
 gunicorn
 numpy
+google-api-python-client
+google-auth-oauthlib
+reportlab

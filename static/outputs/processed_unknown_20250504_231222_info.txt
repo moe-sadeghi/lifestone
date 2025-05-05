@@ -1,0 +1,48 @@
+Output PPI: 25.4
+Corrected Width (in): 151.7993
+Corrected Height (in): 93.0805
+Stone Thickness (mm): 30.0
+
+EXIF Information (original file):
+ImageWidth: 4000
+ImageLength: 3000
+ResolutionUnit: 2
+ExifOffset: 234
+Make: samsung
+Model: Galaxy S23 Ultra
+Software: S918WVLS6CYB3
+Orientation: 1
+DateTime: 2025:04:14 13:57:37
+YCbCrPositioning: 1
+XResolution: 72.0
+YResolution: 72.0
+ExifVersion: b'0220'
+ShutterSpeedValue: 0.008333333333333333
+ApertureValue: 1.53
+DateTimeOriginal: 2025:04:14 13:57:37
+DateTimeDigitized: 2025:04:14 13:57:37
+BrightnessValue: 3.28
+ExposureBiasValue: 0.0
+MaxApertureValue: 1.53
+MeteringMode: 2
+Flash: 0
+FocalLength: 6.3
+ColorSpace: 65535
+ExifImageWidth: 4000
+DigitalZoomRatio: 1.0
+FocalLengthIn35mmFilm: 23
+SceneCaptureType: 0
+OffsetTime: -07:00
+OffsetTimeOriginal: -07:00
+SubsecTime: 420
+SubsecTimeOriginal: 420
+SubsecTimeDigitized: 420
+ExifImageHeight: 3000
+ExposureTime: 0.008333333333333333
+FNumber: 1.7
+ImageUniqueID: EK0XLPE00SM
+ExposureProgram: 2
+ISOSpeedRatings: 125
+ExposureMode: 0
+FlashPixVersion: b'0100'
+WhiteBalance: 0

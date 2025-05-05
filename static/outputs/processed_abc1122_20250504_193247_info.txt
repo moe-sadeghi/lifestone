@@ -1,0 +1,14 @@
+Output PPI: 25.4
+Corrected Width (in): 152.3033
+Corrected Height (in): 93.3896
+Stone Thickness (mm): 20.0
+
+EXIF Information (original file):
+ResolutionUnit: 2
+ExifOffset: 90
+Orientation: 1
+XResolution: 72.0
+YResolution: 72.0
+ColorSpace: 65535
+ExifImageWidth: 4032
+ExifImageHeight: 3024

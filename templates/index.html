@@ -2,52 +2,177 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>Lifestone - Slab Processor</title>
+  <title>Lifestone - Slab Documentation</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <style>
     body { font-family: Arial, sans-serif; padding: 20px; background: #f6f6f6; }
-    form { background: white; padding: 20px; border-radius: 8px; max-width: 500px; margin: auto; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-    input, textarea, button, label, select { display: block; width: 100%; margin-bottom: 15px; }
+    form { background: white; padding: 20px; border-radius: 8px; max-width: 600px; margin: auto; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+    input, textarea, button, label, select { display: block; width: 100%; margin-bottom: 15px; font-size: 18px; padding: 10px; }
     input[type="file"], input[type="checkbox"], select.inline { width: auto; display: inline-block; }
-    button { background-color: #2a7ae2; color: white; border: none; padding: 10px; font-size: 16px; border-radius: 5px; cursor: pointer; }
+    input[type="checkbox"] { width: 20px; height: 20px; }
+    button { background-color: #2a7ae2; color: white; border: none; padding: 12px; font-size: 20px; border-radius: 5px; cursor: pointer; }
     button:hover { background-color: #1e5bbf; }
-    h2 { text-align: center; }
+    h2 { text-align: center; font-size: 24px; }
     .row { display: flex; gap: 10px; }
     .row input, .row select { flex: 1; }
+    .section { margin-top: 20px; border-top: 1px solid #ccc; padding-top: 10px; }
+    .section h3 { margin-bottom: 10px; font-size: 20px; }
+    .required { color: red; font-size: 14px; margin-top: -10px; }
+    .error-box { background-color: #f8d7da; border: 2px solid #f5c6cb; color: #721c24; padding: 15px; border-radius: 5px; margin: 20px 0; font-size: 18px; text-align: center; }
+    .error-box h4 { margin: 0 0 10px 0; font-size: 22px; }
+    .error-box p { margin: 5px 0; }
+    .error-box .options { margin-top: 20px; }
+    .error-box .options a, .error-box .options button { display: inline-block; margin: 0 10px; padding: 10px 20px; font-size: 16px; border-radius: 5px; text-decoration: none; }
+    .error-box .options a { background-color: #dc3545; color: white; }
+    .error-box .options a:hover { background-color: #c82333; }
+    .error-box .options button { background-color: #28a745; color: white; border: none; cursor: pointer; }
+    .error-box .options button:hover { background-color: #218838; }
+    .support-image { margin-bottom: 15px; }
+    .support-image label { font-size: 18px; }
+    .support-image input, .support-image textarea { margin-bottom: 10px; }
+    .support-image textarea { height: 80px; }
+    .add-image-btn { background-color: #28a745; color: white; padding: 10px; font-size: 16px; border-radius: 5px; cursor: pointer; }
+    .add-image-btn:hover { background-color: #218838; }
+    .disclaimer { background-color: #e9ecef; padding: 15px; border-radius: 5px; font-size: 16px; line-height: 1.6; margin-bottom: 15px; }
+    .disclaimer h4 { font-size: 20px; margin-bottom: 10px; }
+    details summary { font-size: 18px; font-weight: bold; cursor: pointer; padding: 10px; background-color: #e9ecef; border-radius: 5px; }
+    details[open] summary { background-color: #d3d6db; }
+    .terms-checkbox { margin-top: 15px; }
+    .promo-box { background-color: #e9f7ef; border: 2px solid #c3e6cb; padding: 15px; border-radius: 5px; margin: 20px 0; font-size: 16px; text-align: center; }
+    .promo-box h4 { margin: 0 0 10px 0; font-size: 20px; color: #155724; }
+    .promo-box p { margin: 5px 0; }
+    .promo-box .coming-soon { color: #6c757d; font-style: italic; }
+    @media (max-width: 600px) {
+        .row { flex-direction: column; }
+        .row input, .row select { width: 100%; }
+        .error-box, .disclaimer, .promo-box { font-size: 16px; }
+        .error-box h4, .promo-box h4 { font-size: 20px; }
+    }
   </style>
 </head>
 <body>
-  <h2>Lifestone - Upload Slab Image</h2>
-  <form action="/confirm" method="POST" enctype="multipart/form-data">
-    <label>Select slab image:</label>
-    <input type="file" name="image" accept="image/*" required>
+  <h2>Lifestone - Slab Documentation</h2>
+  <form action="/confirm" method="POST" enctype="multipart/form-data" id="slabForm">
+    <div class="section">
+      <h3>Company Branding (Optional)</h3>
+      <label for="company_logo">Upload Company Logo:</label>
+      <input type="file" id="company_logo" name="company_logo" accept="image/*">
+      <p>(Recommended size: 200x200 pixels, under 1MB.)</p>
 
-    <label>Select common stone thickness:</label>
-    <select id="presetThickness" onchange="setThicknessFromPreset()">
-      <option value="">-- Select thickness --</option>
-      <option value="30">1-1/4&quot; - 30mm</option>
-      <option value="20">3/4&quot; - 20mm</option>
-      <option value="40">1-1/2&quot; - 40mm</option>
-    </select>
-
-    <label>Or enter custom thickness:</label>
-    <div class="row">
-      <input type="number" name="thickness" id="thicknessInput" value="30" step="0.1" required>
-      <select name="unit" id="unitSelect" class="inline">
-        <option value="mm">mm</option>
-        <option value="inch">inch</option>
-      </select>
+      <label for="company_name">Company Name:</label>
+      <input type="text" id="company_name" name="company_name" placeholder="e.g., My Stone Company">
     </div>
 
-    <label>Notes (optional):</label>
-    <textarea name="notes" rows="4" placeholder="You can describe slab features, ID, location, etc."></textarea>
+    <div class="section">
+      <h3>Slab Image</h3>
+      <label for="slab_image">Select slab image:</label>
+      <input type="file" id="slab_image" name="slab_image" accept="image/*" required>
+      <p class="required">* Required: Please upload the main slab image.</p>
+      <p>(On mobile, tap to take a photo or choose from gallery.)</p>
+      <p>(Recommended image size: under 5MB for faster processing.)</p>
 
-    <label>
-      <input type="checkbox" name="terms" required>
-      I accept the terms and conditions.
-    </label>
+      <label for="presetThickness">Select common stone thickness:</label>
+      <select id="presetThickness" onchange="setThicknessFromPreset()">
+        <option value="">-- Select thickness --</option>
+        <option value="30">1-1/4" - 30mm</option>
+        <option value="20">3/4" - 20mm</option>
+        <option value="40">1-1/2" - 40mm</option>
+      </select>
 
-    <button type="submit">Upload & Process</button>
+      <label for="thicknessInput">Or enter custom thickness:</label>
+      <div class="row">
+        <input type="number" name="thickness" id="thicknessInput" step="0.1" required placeholder="Enter thickness">
+        <select name="unit" id="unitSelect" class="inline">
+          <option value="mm">mm</option>
+          <option value="inch">inch</option>
+        </select>
+      </div>
+      <p class="required">* Required: Please select or enter the slab thickness.</p>
+    </div>
+
+    <div class="promo-box">
+      <h4>Need Detailed Measurements?</h4>
+      <p>For precise slab measurements, the <strong>Lifestone Measurement Tool</strong> is coming soon!</p>
+      <p class="coming-soon">Stay tuned for updates.</p>
+    </div>
+
+    <div class="section">
+      <h3>Slab Specifications (Optional)</h3>
+      <label for="project_name">Project Name:</label>
+      <input type="text" id="project_name" name="project_name" placeholder="e.g., Kitchen Renovation 2025">
+
+      <label for="length">Length (cm):</label>
+      <input type="number" id="length" name="length" step="0.1" placeholder="e.g., 320">
+
+      <label for="width">Width (cm):</label>
+      <input type="number" id="width" name="width" step="0.1" placeholder="e.g., 160">
+
+      <label for="material">Material:</label>
+      <input type="text" id="material" name="material" placeholder="e.g., Granite">
+
+      <label for="serial_number">Serial Number:</label>
+      <input type="text" id="serial_number" name="serial_number" placeholder="e.g., TEST123">
+
+      <label for="make">Make:</label>
+      <input type="text" id="make" name="make" placeholder="e.g., StoneCo">
+
+      <label for="model">Model:</label>
+      <input type="text" id="model" name="model" placeholder="e.g., Black">
+
+      <label for="batch_number">Batch/Lot Number:</label>
+      <input type="text" id="batch_number" name="batch_number" placeholder="e.g., B2025-001">
+    </div>
+
+    <div class="section" id="supportingImages">
+      <h3>Supporting Image (Optional)</h3>
+      <div class="support-image" id="supportImage0">
+        <label for="support_image_0">Supporting Image:</label>
+        <input type="file" id="support_image_0" name="support_image_0" accept="image/*">
+        <p>(Recommended image size: under 5MB.)</p>
+        <label for="support_notes_0">Notes for this image:</label>
+        <textarea id="support_notes_0" name="support_notes_0" placeholder="Add notes about this supporting image (e.g., description of damage, context, etc.)"></textarea>
+      </div>
+      <button type="button" class="add-image-btn" onclick="addSupportImage()">Add Another Image</button>
+    </div>
+
+    <div class="section">
+      <h3>Tester Information</h3>
+      <label for="tester_email">Your Email (for logging purposes):</label>
+      <input type="email" id="tester_email" name="tester_email" required placeholder="e.g., tester@example.com">
+      <p class="required">* Required: Please enter your email for logging.</p>
+    </div>
+
+    <div class="section">
+      <h3>Additional Information (Optional)</h3>
+      <label for="notes">Notes:</label>
+      <textarea id="notes" name="notes" rows="4" placeholder="Describe slab features, ID, location, damages, etc."></textarea>
+
+      <details class="disclaimer">
+        <summary>View Terms and Conditions</summary>
+        <h4>Terms and Conditions for Test Version of Lifestone Stone Catalog Maker</h4>
+        <p>By using the test version of the Stone Catalog Maker application ("the Application") provided by Lifestone, you agree to the following terms and conditions:</p>
+        <p>1. <strong>Test Use Only:</strong> This Application is a test version intended for evaluation and feedback purposes only. It is not intended for commercial use. Lifestone reserves the right to modify, suspend, or discontinue the Application at any time without notice.</p>
+        <p>2. <strong>Intellectual Property:</strong> The Application, including its design, code, and functionality, is the exclusive property of Lifestone and Mohammad Sadeghi and is protected by copyright and other intellectual property laws. All rights, title, and interest in the Application, including but not limited to copyrights, trademarks, and trade secrets, are owned by Lifestone and Mohammad Sadeghi. You may not copy, modify, distribute, reverse-engineer, or create derivative works of the Application without explicit written permission from Lifestone.</p>
+        <p>3. <strong>User Conduct:</strong> You agree to use the Application solely for its intended purpose of documenting stone slabs during the test phase. You may not use the Application for any unlawful or unauthorized purpose, including but not limited to violating intellectual property rights, distributing malicious code, or engaging in activities that interfere with the Application’s functionality.</p>
+        <p>4. <strong>Data and Privacy:</strong> Any data you provide, including images, notes, and personal information (e.g., email addresses), may be collected and stored by Lifestone for testing and improvement purposes. Lifestone will take reasonable measures to protect your data but is not liable for unauthorized access or data breaches beyond its control. By using the Application, you consent to the collection and use of your data as described.</p>
+        <p>5. <strong>Liability Disclaimer:</strong> The Application is provided "as is" without warranties of any kind, either express or implied, including but not limited to warranties of merchantability, fitness for a particular purpose, or non-infringement. Lifestone and Mohammad Sadeghi shall not be liable for any direct, indirect, incidental, special, or consequential damages arising from your use of the Application, including but not limited to loss of data, business interruption, or equipment damage. You use the Application at your own risk.</p>
+        <p>6. <strong>Feedback and Ownership:</strong> Any feedback, suggestions, or improvements you provide to Lifestone regarding the Application become the sole property of Lifestone and Mohammad Sadeghi. Lifestone may use, modify, or incorporate such feedback into the Application or other products without compensation or attribution to you.</p>
+        <p>7. <strong>Termination:</strong> Lifestone may terminate your access to the Application at any time, with or without cause, and with or without notice. Upon termination, you must cease all use of the Application.</p>
+        <p>8. <strong>Indemnification:</strong> You agree to indemnify, defend, and hold harmless Lifestone, Mohammad Sadeghi, its affiliates, officers, and employees from any claims, liabilities, damages, or expenses (including legal fees) arising out of your use of the Application or violation of these terms.</p>
+        <p>9. <strong>Governing Law:</strong> These terms shall be governed by and construed in accordance with the laws of Vancouver, Canada, without regard to its conflict of law principles. Any disputes arising from these terms shall be resolved in the courts of Vancouver, Canada.</p>
+        <p>10. <strong>Contact:</strong> For questions or concerns regarding these terms, please contact Lifestone at <a href="mailto:info@lifestone.ca">info@lifestone.ca</a>.</p>
+        <p>By checking the box below, you acknowledge that you have read, understood, and agree to be bound by these terms and conditions.</p>
+        <div class="terms-checkbox">
+          <label>
+            <input type="checkbox" name="terms" required>
+            I accept the terms and conditions.
+          </label>
+          <p class="required">* Required: Please accept the terms to proceed.</p>
+        </div>
+      </details>
+    </div>
+
+    <button type="submit">Process & Generate Report</button>
   </form>
 
   <script>
@@ -59,6 +184,23 @@
         input.value = preset;
         unit.value = "mm";
       }
+    }
+
+    let imageCount = 0;
+    function addSupportImage() {
+      imageCount++;
+      const container = document.getElementById('supportingImages');
+      const newImageDiv = document.createElement('div');
+      newImageDiv.className = 'support-image';
+      newImageDiv.id = `supportImage${imageCount}`;
+      newImageDiv.innerHTML = `
+        <label for="support_image_${imageCount}">Additional Supporting Image:</label>
+        <input type="file" id="support_image_${imageCount}" name="support_image_${imageCount}" accept="image/*">
+        <p>(Recommended image size: under 5MB.)</p>
+        <label for="support_notes_${imageCount}">Notes for this image:</label>
+        <textarea id="support_notes_${imageCount}" name="support_notes_${imageCount}" placeholder="Add notes about this supporting image"></textarea>
+      `;
+      container.insertBefore(newImageDiv, container.lastElementChild);
     }
   </script>
 </body>
